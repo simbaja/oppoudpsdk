@@ -1,7 +1,7 @@
 import logging
 from typing import Optional, TYPE_CHECKING
 from dataclasses import dataclass
-from datetime import timedelta
+from datetime import datetime, timedelta
 from .const import *
 from .command import *
 from .response import *
@@ -20,10 +20,13 @@ class OppoPlaybackStatus:
   chapter_total: int = 0
   track_elapsed_time: timedelta = timedelta(seconds=0)
   track_remaining_time: timedelta = timedelta(seconds=0)
+  track_duration: timedelta = timedelta(seconds=0)
   chapter_elapsed_time: timedelta = timedelta(seconds=0)
   chapter_remaining_time: timedelta = timedelta(seconds=0)
+  chapter_duration: timedelta = timedelta(seconds=0)
   total_elapsed_time: timedelta = timedelta(seconds=0)
   total_remaining_time: timedelta = timedelta(seconds=0)
+  total_duration: timedelta = timedelta(seconds=0)
   audio_type: str = ""
   subtitle_type: str = ""
   repeat_mode: RepeatMode = RepeatMode.OFF
@@ -113,6 +116,8 @@ class OppoDevice:
         await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QTA))
         await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QTP))
         await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QDS))
+        self._calculate_duration()
+
     finally:
       self._state_events_enabled = True
       await self._client.async_event(EVENT_DEVICE_STATE_UPDATED, self)
@@ -130,6 +135,7 @@ class OppoDevice:
       await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QCR))
       await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QEL))
       await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QRE))
+      self._calculate_duration()
       
     finally:
       self._state_events_enabled = True
@@ -152,8 +158,15 @@ class OppoDevice:
     self.playback_status = PlayStatus.OFF
     self.cddb_id_1 = ""
     self.cddb_id_2 = ""
+    self.last_update_at = datetime.utcnow()
 
     self.playback_attributes = OppoPlaybackStatus()
+
+  def _calculate_duration(self):
+    pa = self.playback_attributes
+    pa.track_duration = pa.track_elapsed_time + pa.track_remaining_time
+    pa.chapter_duration = pa.chapter_elapsed_time + pa.chapter_remaining_time
+    pa.total_duration = pa.total_elapsed_time + pa.total_remaining_time
 
   async def _on_client_disconnected(self):
     self.power_status = PowerStatus.DISCONNECTED
@@ -182,6 +195,9 @@ class OppoDevice:
       else:
         #otherwise, modify the state based on the response
         await response.mutate_state(self)
+
+      #indicate when we last updated
+      self.last_update_at = datetime.utcnow()
 
       if self._state_events_enabled:
         await self._client.async_event(EVENT_DEVICE_STATE_UPDATED, self)
