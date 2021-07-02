@@ -4,7 +4,6 @@ RETRY_INTERVAL = 2
 EVENT_CONNECTED = "connected"
 EVENT_DISCONNECTED = "disconnected"
 EVENT_STATE_CHANGED = "state_changed"
-
 EVENT_READY = "ready"
 EVENT_MESSAGE_RECEIVED = "message_received"
 EVENT_COMMAND_SENDING = "command_sending"

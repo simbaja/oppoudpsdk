@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from ..codes import OppoSetCode, OppoSetCodeType, OppoCode, OppoCodeType
 from ..helpers import *
 from .enums import *
-from .oppo_command import OppoCommand
+from .command import OppoCommand
 
 class OppoSetCommand(OppoCommand):
   def __init__(self, code: OppoSetCodeType, parameters: List[str] = []):      

@@ -1,30 +1,31 @@
 """
 Client example
 """
+import sys
+print(sys.path)
 
 import asyncio
 import logging
-from datetime import timedelta
-from oppoudpsdk.device import OppoDevice
-from oppoudpsdk.const import EVENT_DEVICE_STATE_UPDATED, EVENT_MESSAGE_RECEIVED
-from typing import Any, Dict, Tuple
-
-from oppoudpsdk import (
-  OppoClient
-)
+from oppoudpsdk import EVENT_DEVICE_STATE_UPDATED
+from oppoudpsdk import OppoClient, OppoDevice
+from example.secrets import HOST_NAME
 
 _LOGGER = logging.getLogger(__name__)
 
-HOST_NAME = '10.0.30.27'
-
 async def on_device_state_updated(device: OppoDevice):
   print(f'Status: {device.playback_status}')
+  print(f'Disc Type: {device.disc_type}')
+  print(f'Track Number: {device.playback_attributes.track}')
+  print(f'Track Elapsed: {device.playback_attributes.track_elapsed_time}')
+  print(f'Track Remaining: {device.playback_attributes.track_remaining_time}')
+  print(f'Track Duration: {device.playback_attributes.track_duration}')
   print(f'Chapter Number: {device.playback_attributes.chapter}')
   print(f'Chapter Elapsed: {device.playback_attributes.chapter_elapsed_time}')
   print(f'Chapter Remaining: {device.playback_attributes.chapter_remaining_time}')
+  print(f'Chapter Duration: {device.playback_attributes.chapter_duration}')
   print(f'Total Elapsed: {device.playback_attributes.total_elapsed_time}')
   print(f'Total Remaining: {device.playback_attributes.total_remaining_time}')
-
+  print(f'Total Duration: {device.playback_attributes.total_duration}')
 
 async def main():
   logging.basicConfig(level=logging.DEBUG, format='%(asctime)-15s %(levelname)-8s %(message)s')

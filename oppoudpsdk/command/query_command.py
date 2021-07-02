@@ -1,6 +1,6 @@
 from typing import List
 from ..codes import OppoQueryCode, OppoQueryCodeType, OppoCode, OppoCodeType
-from .oppo_command import OppoCommand
+from .command import OppoCommand
 
 class OppoQueryCommand(OppoCommand):
   def __init__(self, code: OppoQueryCodeType, parameters: List[str] = [], response_codes: List[str] = []):      

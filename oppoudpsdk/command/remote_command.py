@@ -1,5 +1,5 @@
 from ..codes import OppoRemoteCode, OppoRemoteCodeType, OppoCode, OppoCodeType
-from .oppo_command import OppoCommand
+from .command import OppoCommand
 
 class OppoRemoteCommand(OppoCommand):
   def __init__(self, code: OppoRemoteCodeType):      
