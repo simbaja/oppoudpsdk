@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 @dataclass(repr=True, eq=True)
 class OppoCommand:
+  """Represents a command to an OppoDevice"""
   code: OppoCodeType
   _parameters: List[str]
   _response_codes: List[str]

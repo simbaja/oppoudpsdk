@@ -1,12 +1,12 @@
 import asyncio
 import logging
-from typing import Any, Callable, DefaultDict, Dict, List, Optional, Tuple
+from typing import Callable, DefaultDict, Dict, List, Optional, Tuple
 
 from .codes import *
 from .command import *
 from .const import *
 from .device import OppoDevice
-from .exceptions import OppoException, OppoCommandError
+from .exceptions import OppoCommandError
 from .response import *
 from .states import OppoClientState
 from .async_helpers import OppoStreamIterator, CancellableAsyncIterator
@@ -14,6 +14,12 @@ from .async_helpers import OppoStreamIterator, CancellableAsyncIterator
 _LOGGER = logging.getLogger(__name__)
 
 class OppoClient:
+  """
+  Creates a client that can communicate with an Oppo UDP-20x device.
+  The command reference can be found at: http://download.oppodigital.com/UDP203/OPPO_UDP-20X_RS-232_and_IP_Control_Protocol.pdf
+  
+  Must supply the host/IP address and port (default 23).
+  """
   def __init__(self, host_name: str, port_number: int = 23, mac_address: str = None, event_loop: Optional[asyncio.AbstractEventLoop] = None):
     self._host_name = host_name
     self._port_number = port_number
@@ -31,22 +37,24 @@ class OppoClient:
 
   @property
   def state(self) -> OppoClientState:
+    """Gets the state of the client"""
     return self._state
 
   @property
   def loop(self) -> asyncio.AbstractEventLoop:
+    """Gets the asyncio event loop"""
     if self._loop is None:
       self._loop = asyncio.get_event_loop()
     return self._loop
 
   @property
   def connected(self) -> bool:
-    """ Indicates whether the client is in a connected state """
+    """Indicates whether the client is in a connected state"""
     return self._state not in [OppoClientState.DISCONNECTING, OppoClientState.DISCONNECTED]
 
   @property
   def available(self) -> bool:
-    """ Indicates whether the client is available for sending/receiving commands """
+    """Indicates whether the client is available for sending/receiving commands"""
     return self._state == OppoClientState.CONNECTED
 
   @property
@@ -59,20 +67,24 @@ class OppoClient:
       asyncio.ensure_future(cb(*args, **kwargs), loop=self.loop)
 
   def add_event_handler(self, event: str, callback: Callable, disposable: bool = False):
+    """Adds an event handler to an event"""
     if disposable:
       raise NotImplementedError('Support for disposable callbacks not yet implemented')
     self.event_handlers[event].append(callback)
 
   def remove_event_handler(self, event: str, callback: Callable):
+    """Removes an event handler for an event"""
     try:
       self.event_handlers[event].remove(callable)
     except:
       _LOGGER.warn(f"could not remove event handler {event}-{callable}")
 
   def clear_event_handlers(self):
+    """Clears all non-internal event handlers"""
     self._initialize_event_handlers()
 
   async def async_run_client(self):
+    """Runs the client in an event loop including auto-reconnects if the client drops."""
     #reset the disconnect event
     self._disconnect_requested.clear()
 
@@ -111,19 +123,15 @@ class OppoClient:
       await self._set_state(OppoClientState.DISCONNECTED)
 
   async def async_send_command(self, command: OppoCommand):
+    """Sends a command to the client"""
     try:
       await self._send_command(command)
     except asyncio.exceptions.TimeoutError:
       _LOGGER.warning("Timeout waiting for command response.")
       pass
 
-  async def async_request_update(self):
-    _LOGGER.debug("State refresh requested")
-    for code in OppoQueryCode:
-      await self.async_send_command(OppoQueryCommand(code.value))
-
   async def _set_state(self, new_state: OppoClientState) -> bool:
-    """ Indicate that the state changed and raise an event """
+    """Indicate that the state changed and raise an event"""
     if self._state != new_state:
       old_state = self._state
       self._state = new_state
@@ -132,12 +140,14 @@ class OppoClient:
     return False
 
   def _initialize_event_handlers(self):
+    """Initializes the internal event handlers"""
     self._event_handlers = DefaultDict(list)  # type: Dict[str, List[Callable]]
     self.add_event_handler(EVENT_STATE_CHANGED, self._on_state_change)
     self.add_event_handler(EVENT_COMMAND_RESPONSE, self._on_command_response)
     pass
 
   async def _on_state_change(self, old_state: OppoClientState, new_state: OppoClientState):
+    """Handles the on state change event"""
     _LOGGER.debug(f'Client changed state: {old_state} to {new_state}')
 
     if new_state == OppoClientState.CONNECTED:
@@ -146,18 +156,20 @@ class OppoClient:
       await self.async_event(EVENT_DISCONNECTED, None)
 
   async def _on_command_response(self, response: OppoResponse):
+    """Handles a command response received event"""
     _LOGGER.debug(f'Received command response: {response}')
 #    async with self._command_lock:
     self._current_command = None
     self._command_response_received.set()
 
   async def _set_connected(self):
+    """Marks the client as connected"""
     self._retries_since_last_connect = -1
     self._has_successful_connect = True
     await self._set_state(OppoClientState.CONNECTED)
 
   async def _async_run_client(self):
-    """Run the client."""
+    """Run the client (internal)."""
     try:
       await self._set_state(OppoClientState.CONNECTING)
       reader, writer = await asyncio.open_connection(self._host_name, self._port_number)
@@ -178,11 +190,13 @@ class OppoClient:
       await self._disconnect()    
 
   async def _disconnect(self) -> None:
+    """Disconnects the client (internal)"""
     if self._writer:
       self._writer.close()
       await self._writer.wait_closed()
 
   def _initialize_device(self):
+    """Initializes the device (gets power status, and triggers a future initialization)"""
     async def _async_initialize_device():   
       await self.async_send_command(OppoQueryCommand(OppoQueryCode.QPW))
       await self.async_event(EVENT_READY)
@@ -190,6 +204,7 @@ class OppoClient:
     asyncio.ensure_future(_async_initialize_device())
 
   async def _send_command(self, command: OppoCommand):
+    """Sends a command to the client (internal)"""
     _LOGGER.debug(f'Sending command: {command}')
     async with self._command_lock:
       await self.async_event(EVENT_COMMAND_SENDING, command)
@@ -203,10 +218,13 @@ class OppoClient:
       await asyncio.wait_for(self._command_response_received.wait(), COMMAND_TIMEOUT)
 
   async def _process_message(self, message: bytes) -> OppoResponse:
+    """Processes a message received from the Oppo server"""
     _LOGGER.debug(f'Received message: {message}')
     response = get_response(message)
     _LOGGER.debug(f'Parsed message: {response}')
     await self.async_event(EVENT_MESSAGE_RECEIVED, response)
+    #if this event paired to the current command, we need to indicate we've received
+    #the response so that we can initiate more commands
     if self._current_command is not None and response.code.value in self._current_command:
       await self.async_event(EVENT_COMMAND_RESPONSE, response)
     return response

@@ -14,6 +14,7 @@ _LOGGER = logging.getLogger(__name__)
 
 @dataclass(repr=True, eq=True)
 class OppoPlaybackStatus:
+  """Playback attributes for the Oppo device"""
   track: int = 0
   track_total: int = 0
   chapter: int = 0
@@ -41,15 +42,8 @@ class OppoPlaybackStatus:
   rev_speed: SpeedMode = SpeedMode.NORMAL
   fwd_speed: SpeedMode = SpeedMode.NORMAL
 
-class OppoDeviceStatus:
-  hdmi_mode: HdmiMode
-  subtitle_shift: int
-  osd_position: int
-  zoom_mode: ZoomMode
-  hdr_setting: HdrSetting
-  disc_type: DiscType
-  
 class OppoDevice:
+  """Represents a low-level Oppo device"""
   def __init__(self, client: 'OppoClient', mac_address: Optional[str] = None):
     self._client = client
     self._mac_address = mac_address
@@ -64,23 +58,32 @@ class OppoDevice:
 
   @property
   def mac_address(self) -> str:
+    """The oppo device's MAC address"""
     return self._mac_address.upper()
 
   @property
   def is_playing(self) -> bool:
-    return self.playback_status not in [PlayStatus.OFF, PlayStatus.HOME_MENU, PlayStatus.MEDIA_CENTER, PlayStatus.SCREEN_SAVER, PlayStatus.SETUP]  
+    """Indicates whether the device is playing"""
+    return self.playback_status not in [
+      PlayStatus.OFF, 
+      PlayStatus.HOME_MENU, 
+      PlayStatus.MEDIA_CENTER, 
+      PlayStatus.SCREEN_SAVER, 
+      PlayStatus.SETUP
+    ]  
 
   @property
   def cddb_id(self) -> str:
+    """The disc id for the currently loaded disc"""
     return self.cddb_id_1 + self.cddb_id_2
 
   async def async_request_update(self):
-
+    """Request the device to send a full state update"""
     try:
+      #disable individual state events since we're doing a bunch at once
       self._state_events_enabled = False
       await self._client.async_event(EVENT_DEVICE_STATE_UPDATED, self)
 
-      """Request the device to send a full state update"""
       await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QVM))
       await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QPW))
       await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QVR))
@@ -119,10 +122,12 @@ class OppoDevice:
         self._calculate_duration()
 
     finally:
+      #re-enable state events and send the updated event
       self._state_events_enabled = True
       await self._client.async_event(EVENT_DEVICE_STATE_UPDATED, self)
 
   async def async_request_position_update(self):
+    """Requests a playback position update"""
     try:
       self._state_events_enabled = False
       await self._client.async_event(EVENT_DEVICE_STATE_UPDATED, self)
@@ -142,9 +147,11 @@ class OppoDevice:
       await self._client.async_event(EVENT_DEVICE_STATE_UPDATED, self)
 
   async def async_send_command(self, code: OppoRemoteCodeType):
+    """Sends a remote command to the device"""
     await self._client.async_send_command(OppoRemoteCommand(code))
 
   def _reset_attributes(self):
+    """Initializes/resets device attributes"""
     self.is_muted = False
     self.tray_status = TrayStatus.CLOSE
     self.volume = 0
@@ -163,16 +170,19 @@ class OppoDevice:
     self.playback_attributes = OppoPlaybackStatus()
 
   def _calculate_duration(self):
+    """Calculates the track/chapter/total duration (these are not provided by the device directly)"""
     pa = self.playback_attributes
     pa.track_duration = pa.track_elapsed_time + pa.track_remaining_time
     pa.chapter_duration = pa.chapter_elapsed_time + pa.chapter_remaining_time
     pa.total_duration = pa.total_elapsed_time + pa.total_remaining_time
 
   async def _on_client_disconnected(self):
+    """Handles the client disconnected event"""
     self.power_status = PowerStatus.DISCONNECTED
     self._reset_attributes()
 
   async def _on_message_received(self, response: OppoResponse):
+    """Handles message received events, updating state as needed"""
     if response.result == ResultCode.ERROR:
       _LOGGER.info(f"Invalid response {response}, ignoring")
       return
@@ -205,6 +215,7 @@ class OppoDevice:
       _LOGGER.warning("Error updating state.", exc_info=True)
 
   async def _handle_power_response(self, new_status: PowerStatus):
+    """Handles power change events"""
     if self.power_status != new_status:
       self.power_status = new_status
       if self.power_status == PowerStatus.ON:
@@ -214,6 +225,7 @@ class OppoDevice:
         await self.async_request_update()
 
   async def _handle_play_response(self, new_status: PlayStatus):
+    """Handles play status change events"""
     if self.playback_status != new_status:
       self.playback_status = new_status
       if self.is_playing:

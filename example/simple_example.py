@@ -1,5 +1,5 @@
 """
-Client example
+Client example.  Hooks the state updated event to show playback updates as they occur.
 """
 import sys
 print(sys.path)

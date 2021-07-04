@@ -25,6 +25,7 @@ class OppoParsedResponse(NamedTuple):
 
 @dataclass(repr=True, eq=True)
 class OppoResponse:
+  """Represents a response to a command or state update"""
   code: OppoCodeType
   result: ResultCode
   _parameters: List[str]

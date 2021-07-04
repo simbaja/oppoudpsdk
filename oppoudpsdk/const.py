@@ -1,18 +1,30 @@
 MAX_RETRIES = 3
 RETRY_INTERVAL = 2
 
+#occurs when the client is connected
 EVENT_CONNECTED = "connected"
+#occurs when the client is disconnected
 EVENT_DISCONNECTED = "disconnected"
+#occurs when the client state has changed
 EVENT_STATE_CHANGED = "state_changed"
+#occurs when the client is ready
 EVENT_READY = "ready"
+#occurs when the client receives a message
 EVENT_MESSAGE_RECEIVED = "message_received"
+#occurs when a command is about to be sent to the device
 EVENT_COMMAND_SENDING = "command_sending"
+#occurs when a command has been sent to the device
 EVENT_COMMAND_SENT = "command_sent"
+#occurs when the command response has been received
 EVENT_COMMAND_RESPONSE = "command_response"
+#occurs when the command processing has been completed
 EVENT_COMMAND_COMPLETE = "command_complete"
+#occurs when the device is updating
 EVENT_DEVICE_STATE_UPDATING = "device_state_updating"
+#occurs after the device state has been updated
 EVENT_DEVICE_STATE_UPDATED = "device_state_updated"
 
+#per Oppo documentation, assume 10 second timeout
 COMMAND_TIMEOUT = 10
 
 ATTR_DEVICE_FIRMWARE_VERSION = "firmware_version"

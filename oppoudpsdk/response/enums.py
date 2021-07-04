@@ -3,17 +3,20 @@ from typing import Union
 
 @enum.unique
 class ResultCode(enum.Enum):
+  """Indicates whether the command was successful"""
   OK = "OK"
   ERROR = "ER"
 
 @enum.unique
 class PowerStatus(enum.Enum):
+  """Indicate the current power status"""
   DISCONNECTED = "DISCONNECTED"
   ON = "ON"
   OFF = "OFF"
 
 @enum.unique
 class PlayStatus(enum.Enum):
+  """Indicates the current play status"""
   OFF = "OFF"
   PLAY = "PLAY"
   PAUSE = "PAUSE"
@@ -31,6 +34,7 @@ class PlayStatus(enum.Enum):
 
 @enum.unique
 class VolumeLevel(enum.Enum):
+  """Indicates the device volume level"""
   MUTE = "MUTE"
   UNMUTE = "UNMUTE"
 
@@ -41,11 +45,13 @@ VolumeLevelType = Union[VolumeLevel, int]
 
 @enum.unique
 class TrayStatus(enum.Enum):
+  """Indicates the tray status"""
   OPEN = "OPEN"
   CLOSE = "CLOSE"
 
 @enum.unique
 class HdmiMode(enum.Enum):
+  """Indicates the HDMI output mode"""
   UNKNOWN = "UNKNOWN"
   AUTO = "AUTO"
   SRC = "Source Direct"
@@ -68,6 +74,7 @@ class HdmiMode(enum.Enum):
 
 @enum.unique
 class ZoomMode(enum.Enum):
+  """Indicate the zoom mode"""
   UNKNOWN = "UNKNOWN"
   OFF = "00"
   STRETCH = "01"
@@ -85,6 +92,7 @@ class ZoomMode(enum.Enum):
 
 @enum.unique
 class HdrSetting(enum.Enum):
+  """Indicate the HDR setting"""
   UNKNOWN = "UNKNOWN"
   AUTO = "Auto"
   ON = "On"
@@ -93,12 +101,14 @@ class HdrSetting(enum.Enum):
 
 @enum.unique
 class Video3dStatus(enum.Enum):
+  """Indicate the 3D status for the playing video"""
   UNKNOWN = "UNKNOWN"
   V3D = "3D"
   V2D = "2D"
 
 @enum.unique
 class VideoHdrStatus(enum.Enum):
+  """Indicate the HDR status for the playing video"""
   UNKNOWN = "UNKNOWN"
   HDR = "HDR"
   SDR = "SDR"
@@ -106,6 +116,7 @@ class VideoHdrStatus(enum.Enum):
 
 @enum.unique
 class InputSource(enum.Enum):
+  """Indicates the input source"""
   UNKNOWN = "UNKNOWN"
   BLURAY = "0"
   HDMI_IN = "1"
@@ -116,6 +127,7 @@ class InputSource(enum.Enum):
 
 @enum.unique
 class DiscType(enum.Enum):
+  """Indicates the type of disc"""
   UNKNOWN = "UNKNOW-DISC"
   BLURAY = "BD-MV"
   DVD_VIDEO = "DVD-VIDEO"
@@ -130,6 +142,7 @@ class DiscType(enum.Enum):
 
 @enum.unique
 class RepeatMode(enum.Enum):
+  """Indicates the repeat mode"""
   OFF = "00"
   REPEAT_ONE = "01"
   REPEAT_CHAPTER = "02"
@@ -140,6 +153,7 @@ class RepeatMode(enum.Enum):
   
 @enum.unique
 class SpeedMode(enum.Enum):
+  """Indicates the speed mode for FWD/REV operations"""
   SLOW_1_32 = "1/32"
   SLOW_1_16 = "1/16"
   SLOW_1_8 = "1/8"
@@ -154,6 +168,7 @@ class SpeedMode(enum.Enum):
 
 @enum.unique
 class UpdatePlayStatus(enum.Enum):
+  """Indicates the play status (from an update response)"""
   NO_DISC = "DISC"
   LOADING = "LOAD"
   TRAY_OPEN = "OPEN"
@@ -190,6 +205,7 @@ class UpdatePlayStatus(enum.Enum):
 
 @enum.unique
 class UpdateDiscType(enum.Enum):
+  """Indicates the disc type (from an update response)"""
   UNKNOWN = "UNKW"
   BLURAY = "BDMV"
   DVD_VIDEO = "DVDV"

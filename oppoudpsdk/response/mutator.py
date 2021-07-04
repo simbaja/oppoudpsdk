@@ -15,6 +15,7 @@ if TYPE_CHECKING:
   )
 
 class OppoStateMutator(metaclass=abc.ABCMeta):
+  """Represents a mutator that can act on an OppoDevice to change its state"""
   def __init__(self) -> None:
     pass
 

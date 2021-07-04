@@ -4,6 +4,7 @@ from typing import Union
 
 @enum.unique
 class OppoRemoteCode(enum.Enum):
+  """List of Oppo remote codes (i.e. mapped to the remote)"""
   POW = "POW"
   EJT = "EJT"
   PON = "PON"
@@ -72,6 +73,7 @@ class OppoRemoteCode(enum.Enum):
 
 @enum.unique
 class OppoQueryCode(enum.Enum):
+  """List of current state query codes"""
   QVM = "QVM"
   QPW = "QPW"
   QVR = "QVR"
@@ -109,6 +111,7 @@ class OppoQueryCode(enum.Enum):
 
 @enum.unique
 class OppoSetCode(enum.Enum):
+  """Advanced set command code list"""
   SVM = "SVM"
   SHD = "SHD"
   SZM = "SZM"

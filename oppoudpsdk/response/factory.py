@@ -4,10 +4,12 @@ from .response import *
 from .mutator import *
 
 class ResponseMapping(NamedTuple):
+  """Represents a combination of response and mutator which is used to handle a response"""
   response_type: Type
   mutator: OppoStateMutator
 
 def get_response(message: bytes) -> OppoResponse:
+  """Gets the response for a given message."""
   parsed = _parse_message(message)
   try:
     tcode = _translate_code(parsed.code)
@@ -20,6 +22,7 @@ def get_response(message: bytes) -> OppoResponse:
   return OppoResponse(parsed, OppoNopMutator(), message) 
 
 def _parse_message(message: bytes) -> OppoParsedResponse:
+  """Parses a message received to identify the code, result, and parameters """
   decoded = message.decode()
 
   try:
