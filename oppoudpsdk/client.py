@@ -1,4 +1,5 @@
 import asyncio
+from asyncio.exceptions import InvalidStateError
 import logging
 from typing import Callable, DefaultDict, Dict, List, Optional, Tuple
 
@@ -6,7 +7,7 @@ from .codes import *
 from .command import *
 from .const import *
 from .device import OppoDevice
-from .exceptions import OppoCommandError
+from .exceptions import OppoCommandError, OppoInvalidStateError
 from .response import *
 from .states import OppoClientState
 from .async_helpers import OppoStreamIterator, CancellableAsyncIterator
@@ -46,6 +47,11 @@ class OppoClient:
     if self._loop is None:
       self._loop = asyncio.get_event_loop()
     return self._loop
+
+  @property
+  def device(self) -> OppoDevice:
+    """Gets the device associated with this client"""
+    return self._device
 
   @property
   def connected(self) -> bool:
@@ -121,6 +127,25 @@ class OppoClient:
       self._disconnect_requested.set()
       await self._disconnect()
       await self._set_state(OppoClientState.DISCONNECTED)
+
+  async def test_connection(self) -> bool:
+    if self._state != OppoClientState.INITIALIZING:
+      raise OppoInvalidStateError
+    
+    reader = None
+    writer = None
+
+    try:
+      await self._set_state(OppoClientState.CONNECTING)
+      reader, writer = await asyncio.open_connection(self._host_name, self._port_number)
+    except:
+      return False
+    finally:
+      if writer:
+        writer.close()
+        await writer.wait_closed()
+    
+    return True
 
   async def async_send_command(self, command: OppoCommand):
     """Sends a command to the client"""
