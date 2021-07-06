@@ -1,11 +1,12 @@
 import abc
-from datetime import time, timedelta
-from oppoudpsdk.command.enums import VolumeLevel
-import magicattr
+from datetime import timedelta
 from typing import TYPE_CHECKING
+import magicattr
+
+from .enums import VolumeLevel
 
 if TYPE_CHECKING:
-  from ..device import OppoDevice, OppoPlaybackStatus
+  from ..device import OppoDevice
   from .response import (
     OppoResponse, 
     OppoVolumeLevelResponse, 

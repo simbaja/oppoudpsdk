@@ -15,17 +15,17 @@ class OppoSetCommand(OppoCommand):
     return OppoCode(code.value)
 
 class OppoSetVerboseModeCommand(OppoSetCommand):
-  def __init__(self, mode: VerboseMode):
+  def __init__(self, mode: SetVerboseMode):
     super().__init__(OppoSetCode.SVM)
     self._parameters.append(mode)
 
 class OppoSetHdmiModeCommand(OppoSetCommand):
-  def __init__(self, mode: HdmiMode):
+  def __init__(self, mode: SetHdmiMode):
     super().__init__(OppoSetCode.SHD)
     self._parameters.append(mode)
 
 class OppoSetZoomModeCommand(OppoSetCommand):
-  def __init__(self, mode: ZoomMode):
+  def __init__(self, mode: SetZoomMode):
     super().__init__(OppoSetCode.SZM)
     self._parameters.append(mode)
 
@@ -39,7 +39,7 @@ class OppoSetVolumeLevelCommand(OppoSetCommand):
       self._parameters.append(level)
 
 class OppoSetRepeatModeCommand(OppoSetCommand):
-  def __init__(self, mode: RepeatMode):
+  def __init__(self, mode: SetRepeatMode):
     super().__init__(OppoSetCode.SRP)
     self._parameters.append(mode)
 
@@ -54,48 +54,48 @@ class OppoSetOsdPositionCommand(OppoSetCommand):
     self._parameters.append(str(clamp(shift,0,5)))
 
 class OppoSetTimeCodeModeCommand(OppoSetCommand):
-  def __init__(self, mode: TimeCodeMode):
+  def __init__(self, mode: SetTimeCodeMode):
     super().__init__(OppoSetCode.STC)
     self._parameters.append(mode)
 
 class OppoSetHdrModeCommand(OppoSetCommand):
-  def __init__(self, mode: HdrMode):
+  def __init__(self, mode: SetHdrMode):
     super().__init__(OppoSetCode.SHR)
     self._parameters.append(mode)
 
 class OppoSetInputSourceCommand(OppoSetCommand):
-  def __init__(self, source: InputSource):
+  def __init__(self, source: SetInputSource):
     super().__init__(OppoSetCode.SIS)
     self._parameters.append(source)
 
 class OppoSetScreensaverCommand(OppoSetCommand):
-  def __init__(self, mode: ScreenSaverMode):
+  def __init__(self, mode: SetScreenSaverMode):
     super().__init__(OppoSetCode.SSA)
     self._parameters.append(mode)
 
 class OppoSetAppModeCommand(OppoSetCommand):
-  def __init__(self, mode: AppMode):
+  def __init__(self, mode: SetAppMode):
     super().__init__(OppoSetCode.APP)
     self._parameters.append(mode)
 
 class OppoSetSacdPriorityCommand(OppoSetCommand):
-  def __init__(self, mode: SacdPriority):
+  def __init__(self, mode: SetSacdPriority):
     super().__init__(OppoSetCode.SSD)
     self._parameters.append(mode)
 
 class OppoSetSacdOutputModeCommand(OppoSetCommand):
-  def __init__(self, mode: SacdOutputMode):
+  def __init__(self, mode: SetSacdOutputMode):
     super().__init__(OppoSetCode.SDP)
     self._parameters.append(mode)
 
 class OppoSetFwdModeCommand(OppoSetCommand):
-  def __init__(self, mode: Optional[SpeedMode]):
+  def __init__(self, mode: Optional[SetSpeedMode]):
     super().__init__(OppoSetCode.FWD)
     if mode is not None:
       self._parameters.append(mode)
 
 class OppoSetRevModeCommand(OppoSetCommand):
-  def __init__(self, mode: Optional[SpeedMode]):
+  def __init__(self, mode: Optional[SetSpeedMode]):
     super().__init__(OppoSetCode.REV)
     if mode is not None:
       self._parameters.append(mode)

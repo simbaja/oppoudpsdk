@@ -2,7 +2,7 @@ import enum
 from typing import Union
 
 @enum.unique
-class VerboseMode(enum.Enum):
+class SetVerboseMode(enum.Enum):
   OFF = "0"
   INFO = "2"
   VERBOSE = "3"
@@ -11,7 +11,7 @@ class VerboseMode(enum.Enum):
     return str(self.value)
 
 @enum.unique
-class HdmiMode(enum.Enum):
+class SetHdmiMode(enum.Enum):
   AUTO = "AUTO"
   SRC = "SRC"
   UHD_AUTO = "UHD_AUTO"
@@ -35,7 +35,7 @@ class HdmiMode(enum.Enum):
     return str(self.value)
 
 @enum.unique
-class ZoomMode(enum.Enum):
+class SetZoomMode(enum.Enum):
   Z1 = "1"
   AR = "AR"
   FS = "FS"
@@ -54,16 +54,16 @@ class ZoomMode(enum.Enum):
     return str(self.value)
 
 @enum.unique
-class VolumeLevel(enum.Enum):
+class SetVolumeLevel(enum.Enum):
   MUTE = "MUTE"
 
   def __str__(self):
     return str(self.value)
 
-VolumeLevelType = Union[VolumeLevel, int]
+VolumeLevelType = Union[SetVolumeLevel, int]
 
 @enum.unique
-class RepeatMode(enum.Enum):
+class SetRepeatMode(enum.Enum):
   CHAPTER = "CH"
   TRACK = "TT"
   ALL = "ALL"
@@ -75,7 +75,7 @@ class RepeatMode(enum.Enum):
     return str(self.value)
 
 @enum.unique
-class SearchMode(enum.Enum):
+class SetSearchMode(enum.Enum):
   CHAPTER = "C"
   TITLE = "T"
 
@@ -83,7 +83,7 @@ class SearchMode(enum.Enum):
     return str(self.value)
 
 @enum.unique
-class TimeCodeMode(enum.Enum):
+class SetTimeCodeMode(enum.Enum):
   TOTAL_ELAPSED = "E"
   TOTAL_REMAINING = "R"
   TITLE_ELAPSED = "T"
@@ -95,7 +95,7 @@ class TimeCodeMode(enum.Enum):
     return str(self.value)
 
 @enum.unique
-class HdrMode(enum.Enum):
+class SetHdrMode(enum.Enum):
   AUTO = "Auto"
   ON = "On"
   OFF = "Off"
@@ -104,7 +104,7 @@ class HdrMode(enum.Enum):
     return str(self.value)
 
 @enum.unique
-class InputSource(enum.Enum):
+class SetInputSource(enum.Enum):
   BLURAY = "0"
   HDMI_IN = "1"
   HDMI_ARC = "2"
@@ -116,7 +116,7 @@ class InputSource(enum.Enum):
     return str(self.value)
 
 @enum.unique
-class ScreenSaverMode(enum.Enum):
+class SetScreenSaverMode(enum.Enum):
   ON = "ON"
   OFF = "OFF"
   SAVE = "SAVE"
@@ -125,7 +125,7 @@ class ScreenSaverMode(enum.Enum):
     return str(self.value)
 
 @enum.unique
-class AppMode(enum.Enum):
+class SetAppMode(enum.Enum):
   DISC = "DIS"
   MUSIC = "MUS"
   PHOTO = "PHO"
@@ -137,7 +137,7 @@ class AppMode(enum.Enum):
     return str(self.value)
 
 @enum.unique
-class SacdPriority(enum.Enum):
+class SetSacdPriority(enum.Enum):
   MULTI_CHANNEL = "M"
   STEREO = "S"
   CD = "C"
@@ -146,7 +146,7 @@ class SacdPriority(enum.Enum):
     return str(self.value)
 
 @enum.unique
-class SacdOutputMode(enum.Enum):
+class SetSacdOutputMode(enum.Enum):
   DSD = "D"
   PCM = "P"
   AUTO = "A"
@@ -155,7 +155,7 @@ class SacdOutputMode(enum.Enum):
     return str(self.value)
 
 @enum.unique
-class SpeedMode(enum.Enum):
+class SetSpeedMode(enum.Enum):
   SLOW_1_32 = "1/32"
   SLOW_1_16 = "1/16"
   SLOW_1_8 = "1/8"

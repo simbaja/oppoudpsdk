@@ -6,6 +6,7 @@ from .const import *
 from .command import *
 from .response import *
 from .codes import *
+from .helpers import clamp
 
 if TYPE_CHECKING:
     from .client import OppoClient
@@ -150,6 +151,25 @@ class OppoDevice:
     """Sends a remote command to the device"""
     await self._client.async_send_command(OppoRemoteCommand(code))
 
+  async def async_set_input_source(self, source: SetInputSource):
+    """Sets the input source"""
+    await self._client.async_send_command(OppoSetInputSourceCommand(source))
+
+  async def async_set_volume(self, level: int):
+    """Sets the volume, accepts a level between 0 and 100"""
+    await self._client.async_send_command(OppoSetVolumeLevelCommand(clamp(level, 0, 100)))
+
+  async def async_seek_position(self, position_type: SetSearchMode, position: timedelta):
+    """Seeks to a given position within either the chapter or title."""
+    if position_type == SetSearchMode.CHAPTER:
+      await self._client.async_send_command(OppoSetChapterPositionCommand(position))
+    else:
+      await self._client.async_send_command(OppoSetTitlePositionCommand(position))  
+
+  async def async_repeat_mode(self, mode: SetRepeatMode):
+    """Sets the volume, accepts a level between 0 and 100"""
+    await self._client.async_send_command(OppoSetRepeatModeCommand(mode))
+
   def _reset_attributes(self):
     """Initializes/resets device attributes"""
     self.is_muted = False
@@ -220,7 +240,7 @@ class OppoDevice:
       self.power_status = new_status
       if self.power_status == PowerStatus.ON:
         #make sure that verbose mode is enabled
-        await self._client.async_send_command(OppoSetVerboseModeCommand(VerboseMode.VERBOSE))
+        await self._client.async_send_command(OppoSetVerboseModeCommand(SetVerboseMode.VERBOSE))
         #request an update of the state since it was OFF/DISCONNECTED
         await self.async_request_update()
 
