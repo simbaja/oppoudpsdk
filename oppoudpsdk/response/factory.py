@@ -11,6 +11,11 @@ class ResponseMapping(NamedTuple):
 def get_response(message: bytes) -> OppoResponse:
   """Gets the response for a given message."""
   parsed = _parse_message(message)
+
+  #if we don't have a code, and the parameters are on/off, assume power code
+  if parsed.code == "" and len(parsed.parameters) > 0 and parsed.parameters[0] in ["ON","OFF"]:
+    parsed = OppoParsedResponse("QPW", parsed.result, parsed.parameters)
+
   try:
     tcode = _translate_code(parsed.code)
     if tcode in _MAPPING:
