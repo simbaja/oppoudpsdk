@@ -1,6 +1,6 @@
 """Oppo UDP SDK"""
 
-__version__ = "0.1.9"
+__version__ = "0.1.10"
 
 from .codes import OppoRemoteCode, OppoRemoteCodeType
 from .const import *
