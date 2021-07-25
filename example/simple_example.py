@@ -15,6 +15,7 @@ async def on_ready(client: OppoClient):
 async def on_device_state_updated(device: OppoDevice):
   print(f'Status: {device.playback_status}')
   print(f'Disc Type: {device.disc_type}')
+  print(f'Disc ID: {device.cddb_id}')
   print(f'Track Number: {device.playback_attributes.track}')
   print(f'Track Name: {device.playback_attributes.track_name}')
   print(f'Track Elapsed: {device.playback_attributes.track_elapsed_time}')
