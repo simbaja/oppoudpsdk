@@ -92,7 +92,7 @@ class OppoDevice:
         #disable individual state events since we're doing a bunch at once
       self._state_events_enabled = False
       await self._client.async_event(EVENT_DEVICE_STATE_UPDATING, self)
-      #await self._client.async_send_command(OppoSetVerboseModeCommand(SetVerboseMode.OFF))
+      await self._client.async_send_command(OppoSetVerboseModeCommand(SetVerboseMode.VERBOSE))
       await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QVM))
       await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QPW))
       await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QVR))
@@ -112,7 +112,6 @@ class OppoDevice:
       await self.async_request_media_update(False)
     finally:
       #re-enable state events and send the updated event
-      #await self._client.async_send_command(OppoSetVerboseModeCommand(SetVerboseMode.VERBOSE))
       self._state_events_enabled = True
       await self._client.async_event(EVENT_DEVICE_STATE_UPDATED, self)
 
@@ -154,7 +153,6 @@ class OppoDevice:
       #async with self._update_lock:      
       self._state_events_enabled = False
       await self._client.async_event(EVENT_DEVICE_STATE_UPDATING, self)
-      #await self._client.async_send_command(OppoSetVerboseModeCommand(SetVerboseMode.OFF))
       await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QTK))
       await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QCH))
       await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QTE))
@@ -166,7 +164,6 @@ class OppoDevice:
       self._calculate_duration()
       
     finally:
-      #await self._client.async_send_command(OppoSetVerboseModeCommand(SetVerboseMode.VERBOSE))
       self._state_events_enabled = True
       await self._client.async_event(EVENT_DEVICE_STATE_UPDATED, self)
 
