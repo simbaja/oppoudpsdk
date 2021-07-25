@@ -29,8 +29,14 @@ def _parse_message(message: bytes) -> OppoParsedResponse:
     segments = decoded[:-1].split(" ")
     
     p_code = segments[0][1:]
+
+    #must be wrong verbose mode, don't have the actual code
+    if p_code in ["OK","ER"]:
+      p_result = p_code
+      p_code = ""
+      p_parameters = segments[1:]
     #update codes don't have a result...
-    if p_code.startswith('U'):
+    elif p_code.startswith('U'):
       p_result = "OK"
       p_parameters = segments[1:]
     else:
@@ -68,6 +74,7 @@ _MAPPING = {
   OppoCode.QVR: ResponseMapping(OppoStringResponse, OppoSimpleDeviceMutator('value', ATTR_DEVICE_FIRMWARE_VERSION)),
   OppoCode.QVL: ResponseMapping(OppoVolumeLevelResponse, OppoVolumeLevelMutator()),  
   OppoCode.SVL: ResponseMapping(OppoVolumeLevelResponse, OppoVolumeLevelMutator()),  
+  #TODO: there's an undocumented UVL that needs to be mapped
   OppoCode.MUT: ResponseMapping(OppoVolumeLevelResponse, OppoVolumeLevelMutator()),    
   OppoCode.VUP: ResponseMapping(OppoVolumeLevelResponse, OppoVolumeLevelMutator()),    
   OppoCode.VDN: ResponseMapping(OppoVolumeLevelResponse, OppoVolumeLevelMutator()),    

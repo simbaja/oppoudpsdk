@@ -1,4 +1,5 @@
 import logging
+import asyncio
 from typing import Optional, TYPE_CHECKING
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -56,6 +57,7 @@ class OppoDevice:
     self.firmware_version = ""
     self._reset_attributes() 
     self._state_events_enabled = True
+    self._update_lock = asyncio.Lock()
 
   @property
   def mac_address(self) -> str:
@@ -78,13 +80,19 @@ class OppoDevice:
     """The disc id for the currently loaded disc"""
     return self.cddb_id_1 + self.cddb_id_2
 
+  @property
+  def is_updating(self) -> bool:
+    """Indicates whether we are currently updating the state"""
+    return not self._state_events_enabled
+
   async def async_request_update(self):
     """Request the device to send a full state update"""
     try:
-      #disable individual state events since we're doing a bunch at once
+      #async with self._update_lock:
+        #disable individual state events since we're doing a bunch at once
       self._state_events_enabled = False
-      await self._client.async_event(EVENT_DEVICE_STATE_UPDATED, self)
-
+      await self._client.async_event(EVENT_DEVICE_STATE_UPDATING, self)
+      await self._client.async_send_command(OppoSetVerboseModeCommand(SetVerboseMode.OFF))
       await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QVM))
       await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QPW))
       await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QVR))
@@ -124,15 +132,17 @@ class OppoDevice:
 
     finally:
       #re-enable state events and send the updated event
+      await self._client.async_send_command(OppoSetVerboseModeCommand(SetVerboseMode.VERBOSE))
       self._state_events_enabled = True
       await self._client.async_event(EVENT_DEVICE_STATE_UPDATED, self)
 
   async def async_request_position_update(self):
     """Requests a playback position update"""
     try:
+      #async with self._update_lock:      
       self._state_events_enabled = False
-      await self._client.async_event(EVENT_DEVICE_STATE_UPDATED, self)
-
+      await self._client.async_event(EVENT_DEVICE_STATE_UPDATING, self)
+      await self._client.async_send_command(OppoSetVerboseModeCommand(SetVerboseMode.OFF))
       await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QTK))
       await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QCH))
       await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QTE))
@@ -144,6 +154,7 @@ class OppoDevice:
       self._calculate_duration()
       
     finally:
+      await self._client.async_send_command(OppoSetVerboseModeCommand(SetVerboseMode.VERBOSE))
       self._state_events_enabled = True
       await self._client.async_event(EVENT_DEVICE_STATE_UPDATED, self)
 
@@ -248,5 +259,5 @@ class OppoDevice:
     """Handles play status change events"""
     if self.playback_status != new_status:
       self.playback_status = new_status
-      if self.is_playing:
+      if self.is_playing and self._state_events_enabled:
         await self.async_request_update()

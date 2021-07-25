@@ -1,16 +1,16 @@
 """
 Client example.  Hooks the state updated event to show playback updates as they occur.
 """
-import sys
-print(sys.path)
-
 import asyncio
 import logging
-from oppoudpsdk import EVENT_DEVICE_STATE_UPDATED
-from oppoudpsdk import OppoClient, OppoDevice
+from oppoudpsdk import EVENT_DEVICE_STATE_UPDATED, EVENT_READY
+from oppoudpsdk import OppoClient, OppoDevice, SetVerboseMode, OppoSetVerboseModeCommand
 from example.secrets import HOST_NAME
 
 _LOGGER = logging.getLogger(__name__)
+
+async def on_ready(client: OppoClient):
+  await client.async_send_command(OppoSetVerboseModeCommand(SetVerboseMode.VERBOSE))
 
 async def on_device_state_updated(device: OppoDevice):
   print(f'Status: {device.playback_status}')
@@ -32,6 +32,7 @@ async def main():
 
   loop = asyncio.get_event_loop()
   client = OppoClient(HOST_NAME, 23, loop)
+  client.add_event_handler(EVENT_READY, on_ready)
   client.add_event_handler(EVENT_DEVICE_STATE_UPDATED, on_device_state_updated)
   await asyncio.ensure_future(client.async_run_client(), loop=loop)
 

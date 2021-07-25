@@ -74,7 +74,8 @@ class OppoUpdateTimeMutator(OppoStateMutator):
     ) else False
 
     if needs_position_refresh:
-      await device.async_request_position_update()
+      if not device.is_updating:
+        await device.async_request_position_update()
     else: 
       device.playback_attributes.chapter = response.chapter_number
       device.playback_attributes.track = response.title_number

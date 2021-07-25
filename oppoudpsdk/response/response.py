@@ -45,6 +45,10 @@ class OppoResponse:
     self._raw_value = raw_value
     self._mutator = mutator
 
+  @property
+  def raw_value(self):
+    return self._raw_value
+
   def _translate(self, code: OppoCodeType):
     try:
       if isinstance(code, str):

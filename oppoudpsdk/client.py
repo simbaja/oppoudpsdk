@@ -224,7 +224,7 @@ class OppoClient:
     """Initializes the device (gets power status, and triggers a future initialization)"""
     async def _async_initialize_device():   
       await self.async_send_command(OppoQueryCommand(OppoQueryCode.QPW))
-      await self.async_event(EVENT_READY)
+      await self.async_event(EVENT_READY, self)
     
     asyncio.ensure_future(_async_initialize_device())
 
@@ -248,8 +248,17 @@ class OppoClient:
     response = get_response(message)
     _LOGGER.debug(f'Parsed message: {response}')
     await self.async_event(EVENT_MESSAGE_RECEIVED, response)
+
+    #if we're not in the right mode, we just need to assume that everything is good
+    if response.raw_value[:3] in [b"@OK",b"@ER"] and self._current_command is not None:
+      await self.async_event(EVENT_COMMAND_RESPONSE, response)
     #if this event paired to the current command, we need to indicate we've received
     #the response so that we can initiate more commands
-    if self._current_command is not None and response.code.value in self._current_command:
+    elif (
+      self._current_command is not None and 
+      isinstance(response.code, OppoCode) and 
+      response.code.value in self._current_command
+    ):
       await self.async_event(EVENT_COMMAND_RESPONSE, response)
+
     return response
