@@ -16,6 +16,7 @@ async def on_device_state_updated(device: OppoDevice):
   print(f'Status: {device.playback_status}')
   print(f'Disc Type: {device.disc_type}')
   print(f'Track Number: {device.playback_attributes.track}')
+  print(f'Track Name: {device.playback_attributes.track_name}')
   print(f'Track Elapsed: {device.playback_attributes.track_elapsed_time}')
   print(f'Track Remaining: {device.playback_attributes.track_remaining_time}')
   print(f'Track Duration: {device.playback_attributes.track_duration}')

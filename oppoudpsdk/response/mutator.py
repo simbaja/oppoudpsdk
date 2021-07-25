@@ -68,14 +68,14 @@ class OppoUpdatePlayStatusMutator(OppoStateMutator):
 
 class OppoUpdateTimeMutator(OppoStateMutator):
   async def mutate_state(self, device: 'OppoDevice', response: 'OppoUpdateTimeResponse') -> None:
-    needs_position_refresh = True if (
+    needs_media_refresh = True if (
       device.playback_attributes.chapter != response.chapter_number or 
       device.playback_attributes.track != response.title_number
     ) else False
 
-    if needs_position_refresh:
+    if needs_media_refresh:
       if not device.is_updating:
-        await device.async_request_position_update()
+        await device.async_request_media_update()
     else: 
       device.playback_attributes.chapter = response.chapter_number
       device.playback_attributes.track = response.title_number

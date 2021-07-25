@@ -9,7 +9,12 @@ class OppoCommand:
   _parameters: List[str]
   _response_codes: List[str]
 
-  def __init__(self, code: OppoCodeType, parameters: List[str] = [], response_codes: List[str] = []):
+  def __init__(self, code: OppoCodeType, parameters: List[str] = None, response_codes: List[str] = None):
+    if parameters is None:
+      parameters = []
+    if response_codes is None:
+      response_codes = []
+
     self.code = self._translate(code)
     self._parameters = parameters
     self._response_codes = response_codes + [self.code.value]

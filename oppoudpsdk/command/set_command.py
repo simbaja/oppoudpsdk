@@ -6,7 +6,7 @@ from .enums import *
 from .command import OppoCommand
 
 class OppoSetCommand(OppoCommand):
-  def __init__(self, code: OppoSetCodeType, parameters: List[str] = []):      
+  def __init__(self, code: OppoSetCodeType, parameters: List[str] = None):      
     super().__init__(code, parameters)
 
   def _translate(self, code: OppoSetCodeType):
