@@ -224,6 +224,12 @@ class OppoClient:
     """Initializes the device (gets power status, and triggers a future initialization)"""
     async def _async_initialize_device():   
       await self.async_send_command(OppoQueryCommand(OppoQueryCode.QPW))
+
+      #force an update if we are on...
+      if self.device.power_status == PowerStatus.ON:
+        await self.device.async_request_update()
+
+      #indicate we're ready to go
       await self.async_event(EVENT_READY, self)
     
     asyncio.ensure_future(_async_initialize_device())
