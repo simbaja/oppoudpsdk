@@ -23,6 +23,8 @@ EVENT_COMMAND_COMPLETE = "command_complete"
 EVENT_DEVICE_STATE_UPDATING = "device_state_updating"
 #occurs after the device state has been updated
 EVENT_DEVICE_STATE_UPDATED = "device_state_updated"
+#occurs when the disc id changes
+EVENT_DISC_ID_CHANGED = "disc_changed"
 
 #per Oppo documentation, assume 10 second timeout
 COMMAND_TIMEOUT = 10

@@ -78,7 +78,20 @@ class OppoDevice:
   @property
   def cddb_id(self) -> str:
     """The disc id for the currently loaded disc"""
-    return self.cddb_id_1 + self.cddb_id_2
+    return self._cddb_id
+
+  @property
+  def cddb_id_2(self) -> str:
+    return self._cddb_id_2
+  
+  @cddb_id_2.setter
+  def cddb_id_2(self, value: str):
+    self._cddb_id_2 = value
+    if self.cddb_id_1 + self._cddb_id_2 != self._cddb_id:
+      #set the full id
+      self._cddb_id = self.cddb_id_1 + self._cddb_id_2
+      #call the async event to indicate the change
+      self._client.loop.create_task(self._client.async_event(EVENT_DISC_ID_CHANGED, self))
 
   @property
   def is_updating(self) -> bool:
@@ -203,6 +216,7 @@ class OppoDevice:
     self.hdr_setting = HdrSetting.UNKNOWN
     self.disc_type = DiscType.UNKNOWN
     self.playback_status = PlayStatus.OFF
+    self._cddb_id = ""
     self.cddb_id_1 = ""
     self.cddb_id_2 = ""
     self.last_update_at = datetime.utcnow()

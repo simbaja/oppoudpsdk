@@ -31,6 +31,8 @@ class PlayStatus(enum.Enum):
   MEDIA_CENTER = "MEDIA CENTER"
   SCREEN_SAVER = "SCREEN SAVER"
   DISC_MENU = "DISC MENU"
+  CLOSE = "CLOSE"
+  OPEN = "OPEN"
 
 @enum.unique
 class VolumeLevel(enum.Enum):

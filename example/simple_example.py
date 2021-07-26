@@ -3,6 +3,7 @@ Client example.  Hooks the state updated event to show playback updates as they 
 """
 import asyncio
 import logging
+from oppoudpsdk.const import EVENT_DISC_ID_CHANGED
 from oppoudpsdk import EVENT_DEVICE_STATE_UPDATED, EVENT_READY
 from oppoudpsdk import OppoClient, OppoDevice, SetVerboseMode, OppoSetVerboseModeCommand
 from example.secrets import HOST_NAME
@@ -11,6 +12,9 @@ _LOGGER = logging.getLogger(__name__)
 
 async def on_ready(client: OppoClient):
   await client.async_send_command(OppoSetVerboseModeCommand(SetVerboseMode.VERBOSE))
+
+async def on_disc_id_changed(device: OppoDevice):
+  print(f'New Disc ID: {device.cddb_id}')
 
 async def on_device_state_updated(device: OppoDevice):
   print(f'Status: {device.playback_status}')
@@ -36,6 +40,7 @@ async def main():
   client = OppoClient(HOST_NAME, 23, loop)
   client.add_event_handler(EVENT_READY, on_ready)
   client.add_event_handler(EVENT_DEVICE_STATE_UPDATED, on_device_state_updated)
+  client.add_event_handler(EVENT_DISC_ID_CHANGED, on_disc_id_changed)
   await asyncio.ensure_future(client.async_run_client(), loop=loop)
 
 if __name__ == "__main__":
