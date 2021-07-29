@@ -154,6 +154,7 @@ class OppoClient:
       self._command_timeouts = 0
     except asyncio.exceptions.TimeoutError:
       _LOGGER.debug("Timeout waiting for command response.")
+      self._command_timeouts += 1
       if self._command_timeouts > MAX_TIMEOUTS:
         _LOGGER.warn("Multiple timeouts while waiting for command response, will disconnect and retry.")    
         asyncio.ensure_future(self.disconnect())
@@ -179,9 +180,9 @@ class OppoClient:
     _LOGGER.debug(f'Client changed state: {old_state} to {new_state}')
 
     if new_state == OppoClientState.CONNECTED:
-      await self.async_event(EVENT_CONNECTED, None)
+      await self.async_event(EVENT_CONNECTED, self)
     if new_state == OppoClientState.DISCONNECTED:
-      await self.async_event(EVENT_DISCONNECTED, None)
+      await self.async_event(EVENT_DISCONNECTED, self)
 
   async def _on_command_response(self, response: OppoResponse):
     """Handles a command response received event"""

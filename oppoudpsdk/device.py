@@ -234,11 +234,11 @@ class OppoDevice:
     pa.chapter_duration = pa.chapter_elapsed_time + pa.chapter_remaining_time
     pa.total_duration = pa.total_elapsed_time + pa.total_remaining_time
 
-  async def _on_client_connected(self):
+  async def _on_client_connected(self, client: OppoClient):
     """Handles the client connected event"""
     self.power_status = PowerStatus.UNKNOWN
 
-  async def _on_client_disconnected(self):
+  async def _on_client_disconnected(self, client: OppoClient):
     """Handles the client disconnected event"""
     self.power_status = PowerStatus.DISCONNECTED
     self._reset_attributes()

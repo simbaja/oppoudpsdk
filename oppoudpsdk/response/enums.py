@@ -35,6 +35,9 @@ class PlayStatus(enum.Enum):
   CLOSE = "CLOSE"
   OPEN = "OPEN"
 
+  def __str__(self):
+    return str(self.value)  
+
 @enum.unique
 class VolumeLevel(enum.Enum):
   """Indicates the device volume level"""
@@ -51,6 +54,9 @@ class TrayStatus(enum.Enum):
   """Indicates the tray status"""
   OPEN = "OPEN"
   CLOSE = "CLOSE"
+
+  def __str__(self):
+    return str(self.name.replace("_"," ").title())
 
 @enum.unique
 class HdmiMode(enum.Enum):
@@ -75,6 +81,8 @@ class HdmiMode(enum.Enum):
   SD480P = "480P"
   SD480I = "480I"
 
+  def __str__(self):
+    return str(self.name.replace("_"," ").title())
 @enum.unique
 class ZoomMode(enum.Enum):
   """Indicate the zoom mode"""
@@ -93,6 +101,9 @@ class ZoomMode(enum.Enum):
   Z0D3X = "11"
   Z0D4X = "12"
 
+  def __str__(self):
+    return str(self.name.replace("_"," ").title())
+
 @enum.unique
 class HdrSetting(enum.Enum):
   """Indicate the HDR setting"""
@@ -102,6 +113,9 @@ class HdrSetting(enum.Enum):
   OFF = "Off"
   STRIP_METADATA = "StripMetadata"
 
+  def __str__(self):
+    return str(self.name.replace("_"," ").title())
+
 @enum.unique
 class Video3dStatus(enum.Enum):
   """Indicate the 3D status for the playing video"""
@@ -109,6 +123,8 @@ class Video3dStatus(enum.Enum):
   V3D = "3D"
   V2D = "2D"
 
+  def __str__(self):
+    return str(self.value)
 @enum.unique
 class VideoHdrStatus(enum.Enum):
   """Indicate the HDR status for the playing video"""
@@ -116,6 +132,9 @@ class VideoHdrStatus(enum.Enum):
   HDR = "HDR"
   SDR = "SDR"
   DOV = "DOV"
+
+  def __str__(self):
+    return str(self.name.replace("_"," ").title())
 
 @enum.unique
 class InputSource(enum.Enum):
@@ -128,6 +147,9 @@ class InputSource(enum.Enum):
   COAX_IN = "4"
   USB_IN = "5"
 
+  def __str__(self):
+    return str(self.name.replace("_"," ").title())
+    
 @enum.unique
 class DiscType(enum.Enum):
   """Indicates the type of disc"""
@@ -143,6 +165,9 @@ class DiscType(enum.Enum):
   VCD2 = "VCD2"
   SVCD = "SVCD"
 
+  def __str__(self):
+    return str(self.name.replace("_"," ").title())
+    
 @enum.unique
 class RepeatMode(enum.Enum):
   """Indicates the repeat mode"""
@@ -153,6 +178,9 @@ class RepeatMode(enum.Enum):
   REPEAT_TITLE = "04"
   SHUFFLE = "05"
   RANDOM = "06"
+
+  def __str__(self):
+    return str(self.name.replace("_"," ").title())  
   
 @enum.unique
 class SpeedMode(enum.Enum):
