@@ -13,6 +13,7 @@ class PowerStatus(enum.Enum):
   DISCONNECTED = "DISCONNECTED"
   ON = "ON"
   OFF = "OFF"
+  UNKNOWN = "UNKNOWN"
 
 @enum.unique
 class PlayStatus(enum.Enum):

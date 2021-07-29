@@ -28,6 +28,7 @@ class OppoClient:
     self._disconnect_requested = asyncio.Event()
     self._command_response_received = asyncio.Event()
     self._command_lock = asyncio.Lock()
+    self._command_timeouts = 0
     self._retries_since_last_connect = -1
     self._has_successful_connect = False   
     self._state = OppoClientState.INITIALIZING
@@ -105,8 +106,7 @@ class OppoClient:
         _LOGGER.info(f'Error executing command {err}')
       except Exception as err:
         if not self._has_successful_connect:
-          _LOGGER.warn(f'Unhandled exception on first connect attempt: {err}, disconnecting')
-          break
+          _LOGGER.warn(f'Unhandled exception before successful connect: {err}')
         _LOGGER.info(f'Unhandled exception while running client: {err}, ignoring and restarting', exc_info=True)  
       finally:
         if not self._disconnect_requested.is_set():
@@ -151,9 +151,12 @@ class OppoClient:
     """Sends a command to the client"""
     try:
       await self._send_command(command)
+      self._command_timeouts = 0
     except asyncio.exceptions.TimeoutError:
-      _LOGGER.warning("Timeout waiting for command response.")
-      pass
+      _LOGGER.debug("Timeout waiting for command response.")
+      if self._command_timeouts > MAX_TIMEOUTS:
+        _LOGGER.warn("Multiple timeouts while waiting for command response, will disconnect and retry.")    
+        asyncio.ensure_future(self.disconnect())
 
   async def _set_state(self, new_state: OppoClientState) -> bool:
     """Indicate that the state changed and raise an event"""
@@ -183,7 +186,6 @@ class OppoClient:
   async def _on_command_response(self, response: OppoResponse):
     """Handles a command response received event"""
     _LOGGER.debug(f'Received command response: {response}')
-#    async with self._command_lock:
     self._current_command = None
     self._command_response_received.set()
 
@@ -223,12 +225,8 @@ class OppoClient:
   def _initialize_device(self):
     """Initializes the device (gets power status, and triggers a future initialization)"""
     async def _async_initialize_device():   
+      #query the power status to try to determine state
       await self.async_send_command(OppoQueryCommand(OppoQueryCode.QPW))
-
-      #force an update if we are on...
-      if self.device.power_status == PowerStatus.ON:
-        await self.device.async_request_update()
-
       #indicate we're ready to go
       await self.async_event(EVENT_READY, self)
     

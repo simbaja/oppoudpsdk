@@ -50,6 +50,7 @@ class OppoDevice:
     self._client = client
     self._mac_address = mac_address
     self._client.add_event_handler(EVENT_MESSAGE_RECEIVED, self._on_message_received)
+    self._client.add_event_handler(EVENT_CONNECTED, self._on_client_connected)
     self._client.add_event_handler(EVENT_DISCONNECTED, self._on_client_disconnected)
 
     self.power_status = PowerStatus.DISCONNECTED
@@ -232,6 +233,10 @@ class OppoDevice:
     pa.track_duration = pa.track_elapsed_time + pa.track_remaining_time
     pa.chapter_duration = pa.chapter_elapsed_time + pa.chapter_remaining_time
     pa.total_duration = pa.total_elapsed_time + pa.total_remaining_time
+
+  async def _on_client_connected(self):
+    """Handles the client connected event"""
+    self.power_status = PowerStatus.UNKNOWN
 
   async def _on_client_disconnected(self):
     """Handles the client disconnected event"""
