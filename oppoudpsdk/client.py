@@ -242,10 +242,13 @@ class OppoClient:
       self._current_command = command.expected_response_codes
       self._command_response_received.clear()
       if self._writer:
-        #write the command to the stream
-        self._writer.write(command.encode())  
-        await self._writer.drain()
-        await self.async_event(EVENT_COMMAND_SENT, command)
+        try:
+          #write the command to the stream
+          self._writer.write(command.encode())  
+          await self._writer.drain()
+          await self.async_event(EVENT_COMMAND_SENT, command)
+        except ConnectionResetError:
+          _LOGGER.info("Could not send command, connection reset.")
       await asyncio.wait_for(self._command_response_received.wait(), COMMAND_TIMEOUT)
 
   async def _process_message(self, message: bytes) -> OppoResponse:

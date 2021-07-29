@@ -122,13 +122,13 @@ class OppoDevice:
       await self._client.async_send_command(OppoQueryCdCommand())
 
       #request media-related updates
-      await self.async_request_media_update(False)
+      await self.async_request_media_update(False, True)
     finally:
       #re-enable state events and send the updated event
       self._state_events_enabled = True
       await self._client.async_event(EVENT_DEVICE_STATE_UPDATED, self)
 
-  async def async_request_media_update(self, suspend_events: bool = True):
+  async def async_request_media_update(self, suspend_events: bool = True, full_update: bool = False):
     try:
       if self.is_playing:
         if suspend_events:
@@ -143,17 +143,20 @@ class OppoDevice:
         await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QCR))
         await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QEL))
         await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QRE))
-        await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QAT))
-        await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QST))
-        await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QRP))   
-        await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.Q3D))
-        await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QHS))   
-        await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QFT))
-        await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QFN))
-        await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QTN))
-        await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QTA))
-        await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QTP))
-        await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QDS))
+
+        if full_update:
+          await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QAT))
+          await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QST))
+          await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QRP))   
+          await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.Q3D))
+          await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QHS))   
+          await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QFT))
+          await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QFN))
+          await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QTN))
+          await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QTA))
+          await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QTP))
+          await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QDS))
+          
         self._calculate_duration()
     finally:
       if suspend_events:
