@@ -209,6 +209,8 @@ class OppoClient:
       try:
         async for message in CancellableAsyncIterator(OppoStreamIterator(reader), self._disconnect_requested):
           await self._process_message(message)
+      except asyncio.exceptions.IncompleteReadError:
+        pass
       except RuntimeError as err:
         #do nothing if it's a StopAsyncIteration, we just stopped the iteration
         #as part of the disconnect
