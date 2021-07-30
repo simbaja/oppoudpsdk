@@ -106,7 +106,7 @@ class OppoDevice:
         #disable individual state events since we're doing a bunch at once
       self._state_events_enabled = False
       await self._client.async_event(EVENT_DEVICE_STATE_UPDATING, self)
-      await self._client.async_send_command(OppoSetVerboseModeCommand(SetVerboseMode.VERBOSE))
+      await self._client.async_send_command(OppoSetVerboseModeCommand(SetVerboseMode.INFO))
       await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QVM))
       await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QPW))
       await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QVR))
@@ -127,14 +127,16 @@ class OppoDevice:
     finally:
       #re-enable state events and send the updated event
       self._state_events_enabled = True
+      await self._client.async_send_command(OppoSetVerboseModeCommand(SetVerboseMode.VERBOSE))
       await self._client.async_event(EVENT_DEVICE_STATE_UPDATED, self)
 
   async def async_request_media_update(self, suspend_events: bool = True, full_update: bool = False):
     try:
       if self.is_playing:
         if suspend_events:
-          self._state_events_enabled = False
+          self._state_events_enabled = False   
           await self._client.async_event(EVENT_DEVICE_STATE_UPDATING, self)
+          await self._client.async_send_command(OppoSetVerboseModeCommand(SetVerboseMode.INFO))
 
         await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QTK))
         await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QCH))
@@ -148,41 +150,24 @@ class OppoDevice:
         if full_update:
           await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QAT))
           await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QST))
-          await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QRP))   
-          await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.Q3D))
-          await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QHS))   
+          await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QRP))
           await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QFT))
           await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QFN))
           await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QTN))
           await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QTA))
           await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QTP))
           await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QDS))
+          if self.disc_type in [DiscType.BLURAY, DiscType.UHD_BLURAY]:
+            await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QHS))   
+          if self.disc_type in [DiscType.BLURAY, DiscType.UHD_BLURAY, DiscType.DVD_VIDEO]:
+            await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.Q3D))
           
         self._calculate_duration()
     finally:
       if suspend_events:
         self._state_events_enabled = True
+        await self._client.async_send_command(OppoSetVerboseModeCommand(SetVerboseMode.VERBOSE))
         await self._client.async_event(EVENT_DEVICE_STATE_UPDATED, self)        
-
-  async def async_request_position_update(self):
-    """Requests a playback position update"""
-    try:
-      #async with self._update_lock:      
-      self._state_events_enabled = False
-      await self._client.async_event(EVENT_DEVICE_STATE_UPDATING, self)
-      await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QTK))
-      await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QCH))
-      await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QTE))
-      await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QTR))
-      await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QCE))
-      await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QCR))
-      await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QEL))
-      await self._client.async_send_command(OppoQueryCommand(OppoQueryCode.QRE))
-      self._calculate_duration()
-      
-    finally:
-      self._state_events_enabled = True
-      await self._client.async_event(EVENT_DEVICE_STATE_UPDATED, self)
 
   async def async_send_command(self, code: OppoRemoteCodeType):
     """Sends a remote command to the device"""

@@ -113,7 +113,7 @@ class OppoUpdateTimeMutator(OppoStateMutator):
         device.playback_attributes.total_remaining_time = timedelta(0)
         device.playback_attributes.track_remaining_time = timedelta(0)
         device.playback_attributes.chapter_remaining_time = timedelta(0)
-        await device.async_request_position_update()
+        await device.async_request_media_update()
 
 class OppoChapterTotalMutator(OppoStateMutator):
   async def mutate_state(self, device: 'OppoDevice', response: 'OppoCurrentTotalResponse') -> None:

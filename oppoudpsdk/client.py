@@ -208,7 +208,7 @@ class OppoClient:
       self._initialize_device()
       try:
         async for message in CancellableAsyncIterator(OppoStreamIterator(reader), self._disconnect_requested):
-          await self._process_message(message)
+          asyncio.create_task(self._process_message(message))
       except asyncio.exceptions.IncompleteReadError:
         pass
       except RuntimeError as err:
