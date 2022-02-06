@@ -69,6 +69,7 @@ class OppoDevice:
   def is_playing(self) -> bool:
     """Indicates whether the device is playing"""
     return self.playback_status not in [
+      PlayStatus.UNKNOWN,
       PlayStatus.OFF, 
       PlayStatus.HOME_MENU, 
       PlayStatus.MEDIA_CENTER, 
@@ -204,7 +205,7 @@ class OppoDevice:
     self.zoom_mode = ZoomMode.UNKNOWN
     self.hdr_setting = HdrSetting.UNKNOWN
     self.disc_type = DiscType.UNKNOWN
-    self.playback_status = PlayStatus.OFF
+    self.playback_status = PlayStatus.UNKNOWN
     self._cddb_id = ""
     self.cddb_id_1 = ""
     self.cddb_id_2 = ""
