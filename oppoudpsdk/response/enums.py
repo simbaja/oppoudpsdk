@@ -147,7 +147,7 @@ class InputSource(enum.Enum):
   OPTICAL_IN = "3"
   COAX_IN = "4"
   USB_IN = "5"
-  HDMI_BYPASS = "6"
+  HDMI_IN_BYPASS = "6"
 
   def __str__(self):
     return str(self.name.replace("_"," ").title())
